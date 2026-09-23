@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Yt_To_MP3</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>YouTube to MP3</h1>
+
+        <form action="{{ url_for('home') }}" method="POST">
+
+            <label for="url">Enter The Video Link:</label>
+
+            <input
+                type="url"
+                name="url"
+                id="url"
+                placeholder="Enter URL"
+                required>
+
+            <label for="quality">Select Quality:</label>
+
+            <select name="quality" id="quality">
+                <option value="128">128 kbps</option>
+                <option value="192" selected>192 kbps</option>
+                <option value="320">320 kbps</option>
+            </select>
+
+            <button type="submit">Download MP3</button>
+
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+
+    </div>
+
+</body>
+
+</html>
