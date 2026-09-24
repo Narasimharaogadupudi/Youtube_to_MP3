@@ -51,6 +51,7 @@ def home():
 
         options = {
             "format": "bestaudio/best",
+        
             "outtmpl": "downloads/%(title)s.%(ext)s",
         
             "ffmpeg_location": "/usr/bin/ffmpeg",
@@ -58,6 +59,9 @@ def home():
             "extractor_args": {
                 "youtube": {
                     "player_client": ["mweb"]
+                },
+                "youtubepot-bgutilscript": {
+                    "server_home": "/root/bgutil-ytdlp-pot-provider/server"
                 }
             },
         
