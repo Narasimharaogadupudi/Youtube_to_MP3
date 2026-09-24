@@ -52,7 +52,8 @@ def home():
         options = {
             "format": "bestaudio/best",
             "outtmpl": "downloads/%(title)s.%(ext)s",
-            "ffmpeg_location": r"C:\Users\G.V.NARASIMHARAO\Downloads\ffmpeg-9.0.1-essentials_build\ffmpeg-9.0.1-essentials_build\bin",
+            # "ffmpeg_location": r"C:\Users\G.V.NARASIMHARAO\Downloads\ffmpeg-9.0.1-essentials_build\ffmpeg-9.0.1-essentials_build\bin",
+            "ffmpeg_location": "/usr/bin/ffmpeg",
 
             "postprocessors": [
                 {
