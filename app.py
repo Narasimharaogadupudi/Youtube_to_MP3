@@ -52,11 +52,12 @@ def home():
         options = {
             "format": "bestaudio/best",
             "outtmpl": "downloads/%(title)s.%(ext)s",
+        
             "ffmpeg_location": "/usr/bin/ffmpeg",
         
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android_vr", "web"]
+                    "player_client": ["mweb"]
                 }
             },
         
