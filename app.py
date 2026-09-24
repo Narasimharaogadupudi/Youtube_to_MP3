@@ -47,8 +47,8 @@ def home():
         if quality not in ["128", "192", "320"]:
             flash("Invalid quality selected.")
             return redirect(url_for("home"))
-
-
+        
+        
         options = {
             "format": "bestaudio/best",
         
@@ -61,7 +61,7 @@ def home():
                     "player_client": ["mweb"]
                 },
                 "youtubepot-bgutilscript": {
-                    "server_home": "/root/bgutil-ytdlp-pot-provider/server"
+                    "script_path": "/root/bgutil-ytdlp-pot-provider/server/build/generate_once.js"
                 }
             },
         
