@@ -60,8 +60,8 @@ def home():
                 "youtube": {
                     "player_client": ["mweb"]
                 },
-                "youtubepot-bgutilscript": {
-                    "script_path": "/root/bgutil-ytdlp-pot-provider/server/build/generate_once.js"
+                "youtubepot-bgutilhttp": {
+                    "base_url": "http://127.0.0.1:4416"
                 }
             },
         

@@ -1,19 +1,16 @@
+# Get the official bgutil Deno provider
+FROM brainicism/bgutil-ytdlp-pot-provider:2.0.0-deno AS pot-provider
+
+# Main Flask application
 FROM python:3.13-slim
 
 RUN apt-get update \
-    && apt-get install -y ffmpeg curl unzip git nodejs npm \
+    && apt-get install -y ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://deno.land/install.sh | sh \
-    && mv /root/.deno/bin/deno /usr/local/bin/deno
-
-RUN git clone --depth 1 --branch 2.0.0 \
-    https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git \
-    /root/bgutil-ytdlp-pot-provider
-
-RUN cd /root/bgutil-ytdlp-pot-provider/server \
-    && npm ci \
-    && npx tsc
+# Copy Deno and the already-prepared bgutil provider
+COPY --from=pot-provider /usr/bin/deno /usr/bin/deno
+COPY --from=pot-provider /app /opt/bgutil
 
 WORKDIR /app
 
@@ -25,4 +22,5 @@ COPY . .
 
 EXPOSE 10000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
+# Start bgutil provider, then Flask/Gunicorn
+CMD ["sh", "-c", "deno run --allow-env --allow-net --allow-ffi=/opt/bgutil/node_modules --allow-read=/opt/bgutil/node_modules /opt/bgutil/src/main.ts --host 127.0.0.1 & gunicorn --bind 0.0.0.0:10000 app:app"]
