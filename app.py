@@ -50,6 +50,8 @@ def home():
         
         
         options = {
+            "verbose": True,
+            
             "format": "bestaudio/best",
         
             "outtmpl": "downloads/%(title)s.%(ext)s",
