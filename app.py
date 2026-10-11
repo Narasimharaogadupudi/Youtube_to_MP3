@@ -75,14 +75,9 @@ def home():
         "quiet": False,
         "no_warnings": False,
 
-        # YouTube player clients to test
         "extractor_args": {
-            "youtube": {
-                "player_client": [
-                    "mweb",
-                    "tv",
-                    "web_safari"
-                ]
+            "youtubepot-bgutilhttp": {
+                "base_url": "http://127.0.0.1:4416"
             }
         }
     }
