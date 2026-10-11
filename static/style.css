@@ -1,9 +1,11 @@
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
+    padding: 20px;
     font-family: Arial, sans-serif;
     background: #f4f4f4;
 
@@ -15,7 +17,8 @@ body {
 }
 
 .container {
-    width: 420px;
+    width: 100%;
+    max-width: 420px;
     background: white;
     padding: 30px;
     border-radius: 12px;
@@ -25,7 +28,7 @@ body {
 
 h1 {
     text-align: center;
-    margin-bottom: 30px;
+    margin: 0 0 30px;
 }
 
 label {
@@ -46,6 +49,13 @@ button {
 input,
 select {
     border: 1px solid #ccc;
+    background: white;
+}
+
+input:focus,
+select:focus {
+    outline: 2px solid #777;
+    outline-offset: 2px;
 }
 
 button {
@@ -54,13 +64,44 @@ button {
     background: #222;
     color: white;
     cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-button:hover {
+button:hover:not(:disabled) {
     background: #444;
 }
 
-p {
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#status-message,
+.flash-message {
     text-align: center;
     margin-top: 20px;
+    overflow-wrap: anywhere;
+}
+
+#status-message:empty {
+    display: none;
+}
+
+.status-message.success {
+    color: #16803c;
+}
+
+.status-message.error,
+.flash-message {
+    color: #c62828;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 22px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
 }

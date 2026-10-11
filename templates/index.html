@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Yt_To_MP3</title>
+    <title>YouTube to MP3</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -16,18 +16,13 @@
 
         <h1>YouTube to MP3</h1>
 
-        <form action="{{ url_for('home') }}" method="POST">
+        <form id="download-form" action="{{ url_for('home') }}" method="POST">
 
-            <label for="url">Enter The Video Link:</label>
+            <label for="url">Enter the video link:</label>
 
-            <input
-                type="url"
-                name="url"
-                id="url"
-                placeholder="Enter URL"
-                required>
+            <input type="url" name="url" id="url" placeholder="https://www.youtube.com/watch?v=..." required>
 
-            <label for="quality">Select Quality:</label>
+            <label for="quality">Select quality:</label>
 
             <select name="quality" id="quality">
                 <option value="128">128 kbps</option>
@@ -35,17 +30,99 @@
                 <option value="320">320 kbps</option>
             </select>
 
-            <button type="submit">Download MP3</button>
+            <button type="submit" id="download-button">
+                Download MP3
+            </button>
 
         </form>
 
+        <p id="status-message" role="status" aria-live="polite"></p>
+
         {% with messages = get_flashed_messages() %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
+        {% for message in messages %}
+        <p class="flash-message">{{ message }}</p>
+        {% endfor %}
         {% endwith %}
 
     </div>
+
+    <script>
+        const form = document.getElementById("download-form");
+        const button = document.getElementById("download-button");
+        const statusMessage = document.getElementById("status-message");
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            button.disabled = true;
+            button.textContent = "Preparing MP3...";
+            statusMessage.textContent = "Please wait while your audio is prepared.";
+            statusMessage.className = "status-message";
+
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+
+                if (!response.ok) {
+                    let message = "Download failed. Please try again.";
+
+                    try {
+                        const data = await response.json();
+                        message = data.error || message;
+                    } catch (_) {
+                        // Keep the default error message.
+                    }
+
+                    throw new Error(message);
+                }
+
+                const blob = await response.blob();
+
+                if (blob.size === 0) {
+                    throw new Error("The downloaded file is empty.");
+                }
+
+                const disposition =
+                    response.headers.get("Content-Disposition") || "";
+
+                const filenameMatch =
+                    disposition.match(/filename="?([^";]+)"?/i);
+
+                const filename = filenameMatch
+                    ? filenameMatch[1]
+                    : "audio.mp3";
+
+                const downloadUrl = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+
+                link.href = downloadUrl;
+                link.download = filename;
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                setTimeout(() => URL.revokeObjectURL(downloadUrl), 60000);
+
+                statusMessage.textContent =
+                    "Download started! Check your browser's Downloads.";
+                statusMessage.className = "status-message success";
+
+            } catch (error) {
+                statusMessage.textContent = error.message;
+                statusMessage.className = "status-message error";
+
+            } finally {
+                button.disabled = false;
+                button.textContent = "Download MP3";
+            }
+        });
+    </script>
 
 </body>
 
