@@ -46,7 +46,7 @@ def home():
     options = {
         "format": "bestaudio/best",
         "outtmpl": "downloads/%(id)s-%(title)s.%(ext)s",
-        "ffmpeg_location": "/usr/bin/ffmpeg",
+        "ffmpeg_location": None if os.name == "nt" else "/usr/bin",
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
