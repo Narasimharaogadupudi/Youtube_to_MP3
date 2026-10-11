@@ -7,7 +7,9 @@ import yt_dlp
 import os
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "local-development-key")
+app.secret_key = os.environ.get(
+    "SECRET_KEY", "local-development-key"
+)
 
 
 @app.route("/")
@@ -21,7 +23,8 @@ def home():
         return render_template("index.html")
 
     is_ajax = (
-        request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        request.headers.get("X-Requested-With")
+        == "XMLHttpRequest"
     )
 
     def error_response(message, status=400):
@@ -37,7 +40,9 @@ def home():
     if not url:
         return error_response("Please enter a YouTube URL.")
 
-    if not ("youtube.com/" in url or "youtu.be/" in url):
+    if not (
+        "youtube.com/" in url or "youtu.be/" in url
+    ):
         return error_response("Enter a valid YouTube URL.")
 
     if quality not in ["128", "192", "320"]:
@@ -46,7 +51,12 @@ def home():
     options = {
         "format": "bestaudio/best",
         "outtmpl": "downloads/%(id)s-%(title)s.%(ext)s",
-        "ffmpeg_location": None if os.name == "nt" else "/usr/bin",
+
+        # Windows uses PATH; Render uses /usr/bin.
+        "ffmpeg_location": (
+            None if os.name == "nt" else "/usr/bin"
+        ),
+
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
@@ -54,12 +64,27 @@ def home():
                 "preferredquality": quality
             }
         ],
+
         "retries": 3,
         "fragment_retries": 3,
         "continuedl": True,
         "noplaylist": True,
+
+        # Diagnostic logging
+        "verbose": True,
         "quiet": False,
-        "no_warnings": False
+        "no_warnings": False,
+
+        # YouTube player clients to test
+        "extractor_args": {
+            "youtube": {
+                "player_client": [
+                    "mweb",
+                    "tv",
+                    "web_safari"
+                ]
+            }
+        }
     }
 
     try:
@@ -69,10 +94,13 @@ def home():
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
 
+        # FFmpeg converts the downloaded audio to MP3.
         mp3_file = os.path.splitext(filename)[0] + ".mp3"
 
         if not os.path.isfile(mp3_file):
-            raise FileNotFoundError("MP3 file was not created.")
+            raise FileNotFoundError(
+                "MP3 file was not created."
+            )
 
         response = send_file(
             mp3_file,
@@ -81,21 +109,24 @@ def home():
             mimetype="audio/mpeg"
         )
 
+        # Delete the temporary MP3 after the response closes.
         def cleanup():
             try:
                 if os.path.exists(mp3_file):
                     os.remove(mp3_file)
-                    print("Temporary file deleted.")
+                    print("Temporary MP3 file deleted.")
             except OSError as exc:
-                print("File deletion failed:", exc)
+                print("File deletion failed:", repr(exc))
 
         response.call_on_close(cleanup)
         return response
 
     except Exception as exc:
-        print("DOWNLOAD ERROR:", repr(exc))
+        # Full details will appear in Render's runtime logs.
+        app.logger.exception("DOWNLOAD ERROR")
+
         return error_response(
-            "Download failed. This video may be unavailable or YouTube may have blocked the request.",
+            "Download failed. Check the server logs for details.",
             500
         )
 
